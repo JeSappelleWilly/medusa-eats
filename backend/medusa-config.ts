@@ -19,18 +19,18 @@ module.exports = defineConfig({
     },
   },
   modules: {
-  eventBus: {
-    resolve: "@medusajs/event-bus-redis",
-    options: {
-      redisUrl: REDIS_URL
-    }
-  },
-  cacheService: {
-    resolve: "@medusajs/cache-redis",
-    options: {
-      redisUrl: REDIS_URL
-    }
-  },*/
+    eventBus: {
+      resolve: "@medusajs/event-bus-redis",
+      options: {
+        redisUrl: REDIS_URL
+      }
+    },
+    cacheService: {
+      resolve: "@medusajs/cache-redis",
+      options: {
+        redisUrl: REDIS_URL
+      }
+    },
     restaurantModuleService: {
       resolve: "./modules/restaurant",
     },
