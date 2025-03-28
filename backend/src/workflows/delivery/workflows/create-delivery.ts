@@ -19,7 +19,7 @@ type WorkflowInput = {
 export const createDeliveryWorkflowId = "create-delivery-workflow";
 export const createDeliveryWorkflow = createWorkflow(
   createDeliveryWorkflowId,
-  function (input: WorkflowData<WorkflowInput>): WorkflowResponse<DeliveryDTO> {
+  function (input: WorkflowData<WorkflowInput>): WorkflowResponse<any> {
     const delivery = createDeliveryStep();
 
     const links = transform({
