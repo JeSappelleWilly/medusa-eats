@@ -4,7 +4,6 @@ import {
   WorkflowResponse,
 } from "@medusajs/workflows-sdk";
 import { UpdateDeliveryDTO } from "../../../modules/delivery/types/mutations";
-import { DeliveryDTO } from "../../../modules/delivery/types/common";
 import { updateDeliveryStep } from "../../delivery/steps";
 import { setStepFailedStep, setStepSuccessStep } from "../../util/steps";
 
@@ -20,7 +19,7 @@ export const updateDeliveryWorkflow = createWorkflow(
     // Update the delivery with the provided data
     const updatedDelivery = updateDeliveryStep({
       data: input.data,
-    }) as WorkflowData<DeliveryDTO>;
+    }) as WorkflowData<any>;
 
     // Ensure the delivery has all required properties
     const completeDelivery = {
