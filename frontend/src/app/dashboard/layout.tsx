@@ -44,7 +44,7 @@ export default async function RootLayout({
           <ProfileBadge user={user} />
         </div>
       </nav>
-<main className="flex flex-col gap-20 p-4 md:p-10 min-h-[calc(100vh-8rem)] max-w-7xl items-center justify-start">
+<main className="flex flex-col gap-20 p-4 md:p-10 min-h-[calc(100vh-8rem)] max-w-7xl items-center justify-content">
       {children}
       </main>
       <Footer />
