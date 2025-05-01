@@ -25,346 +25,193 @@ import { createRestaurantWorkflow } from "../workflows/restaurant/workflows/crea
 import { createRestaurantProductsWorkflow } from "../workflows/restaurant/workflows/create-restaurant-products";
 
 dotenv.config();
-
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
+// Core region definitions
+const REGIONS = [
+  {
+    name: "Europe",
+    currency_code: "eur",
+    countries: ["gb", "de", "dk", "se", "fr", "es", "it"],
+    payment_providers: ["pp_system_default"],
+  },
+  {
+    name: "ECOWAS",
+    currency_code: "xof",
+    countries: [
+      "bf","bj","ci","cv","gm","gh","gn","gw","lr",
+      "ml","mr","ne","sn","sl","tg",
+    ],
+    payment_providers: ["pp_system_default"],
+  },
+  {
+    name: "CEMAC",
+    currency_code: "xaf",
+    countries: ["cm","cf","td","cg","gq","ga"],
+    payment_providers: ["pp_system_default"],
+  },
+];
 
 export default async function seedDemoData({ container }: ExecArgs) {
   const logger: Logger = container.resolve(ContainerRegistrationKeys.LOGGER);
-  const remoteLink: Link = container.resolve(
-    ContainerRegistrationKeys.LINK
-  );
-  const fulfillmentModuleService = container.resolve(
-    ModuleRegistrationName.FULFILLMENT
-  );
-  const salesChannelModuleService = container.resolve(
-    ModuleRegistrationName.SALES_CHANNEL
-  );
-  const storeModuleService = container.resolve(ModuleRegistrationName.STORE);
+  const linkService: Link = container.resolve(ContainerRegistrationKeys.LINK);
+  const fulfillmentService = container.resolve(ModuleRegistrationName.FULFILLMENT);
+  const salesChannelService = container.resolve(ModuleRegistrationName.SALES_CHANNEL);
+  const storeService = container.resolve(ModuleRegistrationName.STORE);
 
-  const countries = ["gb", "de", "dk", "se", "fr", "es", "it"];
+  logger.info("🌱 Starting seeding demo data...");
 
-  logger.info("Seeding store data...");
-  const [store] = await storeModuleService.listStores();
-  let defaultSalesChannel = await salesChannelModuleService.listSalesChannels({
-    name: "Default Sales Channel",
-  });
-
-  if (!defaultSalesChannel.length) {
-    // create the default sales channel
-    const { result: salesChannelResult } = await createSalesChannelsWorkflow(
-      container
-    ).run({
-      input: {
-        salesChannelsData: [
-          {
-            name: "Default Sales Channel",
-          },
-        ],
-      },
+  // --- Sales Channel & Store Setup ---
+  let [store] = await storeService.listStores();
+  let channels = await salesChannelService.listSalesChannels({ name: "Default Sales Channel" });
+  if (!channels.length) {
+    const { result } = await createSalesChannelsWorkflow(container).run({
+      input: { salesChannelsData: [{ name: "Default Sales Channel" }] },
     });
-    defaultSalesChannel = salesChannelResult;
+    channels = result;
+    logger.info("✅ Created Default Sales Channel");
   }
+  const defaultChannelId = channels[0].id;
+
+  // Derive supported currencies (unique codes + USD) and mark EUR default
+  const supportedCurrencies = Array.from(
+    new Set([...REGIONS.map(r => r.currency_code), "usd"])
+  ).map(code => ({ currency_code: code, is_default: code === "eur" }));
 
   await updateStoresWorkflow(container).run({
     input: {
       selector: { id: store.id },
       update: {
-        supported_currencies: [
-          {
-            currency_code: "eur",
-            is_default: true,
-          },
-          {
-            currency_code: "usd",
-          },
-        ],
-        default_sales_channel_id: defaultSalesChannel[0].id,
+        supported_currencies: supportedCurrencies,
+        default_sales_channel_id: defaultChannelId,
       },
     },
   });
-  logger.info("Seeding region data...");
-  const { result: regionResult } = await createRegionsWorkflow(container).run({
-    input: {
-      regions: [
-        {
-          name: "Europe",
-          currency_code: "eur",
-          countries,
-          payment_providers: ["pp_system_default"],
-        },
-      ],
-    },
-  });
-  const region = regionResult[0];
-  logger.info("Finished seeding regions.");
+  logger.info("✅ Updated store with supported currencies & sales channel");
 
-  logger.info("Seeding tax regions...");
+  // --- Region & Tax Setup ---
+  logger.info("🗺️ Creating regions...");
+  const { result: regions } = await createRegionsWorkflow(container).run({
+    input: { regions: REGIONS },
+  });
+  logger.info(`✅ Created ${regions.length} regions`);
+
+  // Create tax regions for every country across all regions
+  const allCountries = REGIONS.flatMap(r => r.countries);
   await createTaxRegionsWorkflow(container).run({
-    input: countries.map((country_code) => ({
-      country_code,
-    })),
+    input: allCountries.map(code => ({ country_code: code })),
   });
-  logger.info("Finished seeding tax regions.");
+  logger.info("✅ Created tax regions for all countries");
 
-  logger.info("Seeding fulfillment data...");
-  const { result: shippingProfileResult } =
-    await createShippingProfilesWorkflow(container).run({
-      input: {
-        data: [
-          {
-            name: "Default",
-            type: "default",
-          },
-        ],
-      },
+  // --- Shipping Profile ---
+  const { result: shippingProfiles } = await createShippingProfilesWorkflow(container).run({
+    input: { data: [{ name: "Default", type: "default" }] },
+  });
+  const shippingProfile = shippingProfiles[0];
+
+  // Get default fulfillment provider
+  const provider = (await fulfillmentService.listFulfillmentProviders({}, { take: 1 }))[0];
+
+  // --- Fulfillment & Stock Location per Region ---
+  for (const reg of regions) {
+    logger.info(`🚚 Seeding fulfillment & stock location for ${reg.name}...`);
+
+    // 1. Fulfillment Set
+    const serviceZone = {
+      name: `${reg.name} Zone`,
+      geo_zones: reg.countries.map(cc => ({ country_code: cc, type: "country" })),
+    };
+    const fulfillmentSet = await fulfillmentService.createFulfillmentSets({
+      name: `${reg.name} Warehouse Delivery`,
+      type: "shipping",
+      service_zones: [serviceZone],
     });
-  const shippingProfile = shippingProfileResult[0];
 
-  const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
-    name: "European Warehouse delivery",
-    type: "shipping",
-    service_zones: [
-      {
-        name: "Europe",
-        geo_zones: [
-          {
-            country_code: "gb",
-            type: "country",
-          },
-          {
-            country_code: "de",
-            type: "country",
-          },
-          {
-            country_code: "dk",
-            type: "country",
-          },
-          {
-            country_code: "se",
-            type: "country",
-          },
-          {
-            country_code: "fr",
-            type: "country",
-          },
-          {
-            country_code: "es",
-            type: "country",
-          },
-          {
-            country_code: "it",
-            type: "country",
-          },
-        ],
-      },
-    ],
-  });
-
-  logger.info("Seeding stock location data...");
-  const { result: stockLocationResult } = await createStockLocationsWorkflow(
-    container
-  ).run({
-    input: {
-      locations: [
-        {
-          name: "European Warehouse",
+    // 2. Stock Location
+    const { result: stockLocations } = await createStockLocationsWorkflow(container).run({
+      input: {
+        locations: [{
+          name: `${reg.name} Warehouse`,
           address: {
-            city: "Copenhagen",
-            country_code: "DK",
+            city: `${reg.name} HQ`, 
+            country_code: reg.countries[0].toUpperCase(),
             address_1: "",
           },
-        },
-      ],
-    },
-  });
-  const stockLocation = stockLocationResult[0];
+        }],
+      },
+    });
+    const stockLocation = stockLocations[0];
 
-  const fulfillmentProvider = await fulfillmentModuleService
-    .listFulfillmentProviders({}, { take: 1 })
-    .then((res) => res[0]);
+    // 3. Remote Linking
+    await linkService.create([
+      { [Modules.STOCK_LOCATION]: { stock_location_id: stockLocation.id }, [Modules.FULFILLMENT]: { fulfillment_set_id: fulfillmentSet.id } },
+      { [Modules.STOCK_LOCATION]: { stock_location_id: stockLocation.id }, [Modules.FULFILLMENT]: { fulfillment_provider_id: provider.id } },
+      { [Modules.SALES_CHANNEL]: { sales_channel_id: fulfillmentSet.id }, [Modules.STOCK_LOCATION]: { stock_location_id: stockLocation.id } },
+    ]);
 
-  const fulfillmentProviderId = fulfillmentProvider.id;
-
-  await remoteLink.create([
-    {
-      [Modules.STOCK_LOCATION]: {
-        stock_location_id: stockLocation.id,
-      },
-      [Modules.FULFILLMENT]: {
-        fulfillment_set_id: fulfillmentSet.id,
-      },
-    },
-    {
-      [Modules.STOCK_LOCATION]: {
-        stock_location_id: stockLocation.id,
-      },
-      [Modules.FULFILLMENT]: {
-        fulfillment_provider_id: fulfillmentProviderId,
-      },
-    },
-    {
-      [Modules.SALES_CHANNEL]: {
-        sales_channel_id: fulfillmentSet.id,
-      },
-      [Modules.STOCK_LOCATION]: {
-        stock_location_id: stockLocation.id,
-      },
-    },
-  ]);
-
-  logger.info("Finished seeding stock location data.");
-
-  await createShippingOptionsWorkflow(container).run({
-    input: [
+    // 4. Shipping Options
+    const regionShippingOptions = [
       {
-        name: "Standard Shipping",
+        name: `${reg.name} Standard Shipping`,
         price_type: "flat",
-        provider_id: fulfillmentProviderId,
+        provider_id: provider.id,
         service_zone_id: fulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
-        type: {
-          label: "Standard",
-          description: "Ship in 2-3 days.",
-          code: "standard",
-        },
-        prices: [
-          {
-            currency_code: "usd",
-            amount: 10,
-          },
-          {
-            currency_code: "eur",
-            amount: 10,
-          },
-          {
-            region_id: region.id,
-            amount: 10,
-          },
-        ],
+        type: { label: "Standard", description: "Ship in 2-3 days.", code: "standard" },
+        prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 10 })),
         rules: [
-          {
-            attribute: "enabled_in_store",
-            value: '"true"',
-            operator: "eq",
-          },
-          {
-            attribute: "is_return",
-            value: "false",
-            operator: "eq",
-          },
+          { attribute: "enabled_in_store", operator: "eq", value: '"true"' },
+          { attribute: "is_return", operator: "eq", value: "false" },
         ],
       },
       {
-        name: "Express Shipping",
+        name: `${reg.name} Express Shipping`,
         price_type: "flat",
-        provider_id: fulfillmentProviderId,
+        provider_id: provider.id,
         service_zone_id: fulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
-        type: {
-          label: "Express",
-          description: "Ship in 24 hours.",
-          code: "express",
-        },
-        prices: [
-          {
-            currency_code: "usd",
-            amount: 10,
-          },
-          {
-            currency_code: "eur",
-            amount: 10,
-          },
-          {
-            region_id: region.id,
-            amount: 10,
-          },
-        ],
+        type: { label: "Express", description: "Ship in 24 hours.", code: "express" },
+        prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 20 })),
         rules: [
-          {
-            attribute: "enabled_in_store",
-            value: '"true"',
-            operator: "eq",
-          },
-          {
-            attribute: "is_return",
-            value: "false",
-            operator: "eq",
-          },
+          { attribute: "enabled_in_store", operator: "eq", value: '"true"' },
+          { attribute: "is_return", operator: "eq", value: "false" },
         ],
       },
-    ],
-  });
-  logger.info("Finished seeding fulfillment data.");
+    ];
+    await createShippingOptionsWorkflow(container).run({ input: regionShippingOptions });
+    logger.info(`✅ Seeded shipping for ${reg.name}`);
+  }
 
-  logger.info("Seeding publishable API key data...");
-  const { result: publishableApiKeyResult } = await createApiKeysWorkflow(
-    container
-  ).run({
-    input: {
-      api_keys: [
-        {
-          title: "Webshop",
-          type: "publishable",
-          created_by: "",
-        },
-      ],
-    },
+  // --- API Keys & Channel Linking ---
+  logger.info("🔑 Seeding API keys...");
+  const { result: apiKeys } = await createApiKeysWorkflow(container).run({
+    input: { api_keys: [{ title: "Webshop", type: "publishable", created_by: "" }] },
   });
-  const publishableApiKey = publishableApiKeyResult[0];
+  const pubKey = apiKeys[0];
+  await linkSalesChannelsToApiKeyWorkflow(container).run({ input: { id: pubKey.id, add: [defaultChannelId] } });
+  logger.info("✅ Published API key and linked to sales channel");
 
-  await linkSalesChannelsToApiKeyWorkflow(container).run({
-    input: {
-      id: publishableApiKey.id,
-      add: [defaultSalesChannel[0].id],
-    },
-  });
-  logger.info("Finished seeding publishable API key data.");
-
-  logger.info("Seeding restaurant data...");
+  // --- Restaurant & Product Data ---
+  logger.info("🍽️ Seeding restaurant & product data...");
   const { restaurant } = medusaEatsSeedData;
-
   restaurant.image_url = FRONTEND_URL + restaurant.image_url;
+  const { result: [createdRestaurant] } = await createRestaurantWorkflow(container).run({ input: { restaurant } });
 
-  const { result: createdRestaurant } = await createRestaurantWorkflow(
-    container
-  ).run({
-    input: {
-      restaurant,
-    },
+  const { result: categories } = await createProductCategoriesWorkflow(container).run({
+    input: { product_categories: medusaEatsSeedData.categories },
   });
 
-  logger.info("Seeding product data...");
-
-  const { result: categoryResult } = await createProductCategoriesWorkflow(
-    container
-  ).run({
-    input: {
-      product_categories: medusaEatsSeedData.categories,
-    },
-  });
-
-  const productData = medusaEatsSeedData.products.map((product) => {
-    const { id } = categoryResult.find((c) => c.handle === product.category);
-    delete product.category;
+  const products = medusaEatsSeedData.products.map(p => {
+    const { id } = categories.find(c => c.handle === p.category)!;
     return {
-      ...product,
-      thumbnail: FRONTEND_URL + product.thumbnail,
+      ...p,
+      thumbnail: FRONTEND_URL + p.thumbnail,
       category_ids: [id],
       status: ProductStatus.PUBLISHED,
-      sales_channels: [
-        {
-          id: defaultSalesChannel[0].id,
-        },
-      ],
+      sales_channels: [{ id: defaultChannelId }],
     };
   });
+  await createRestaurantProductsWorkflow(container).run({ input: { products, restaurant_id: createdRestaurant.id } });
 
-  await createRestaurantProductsWorkflow(container).run({
-    input: {
-      products: productData,
-      restaurant_id: createdRestaurant.id,
-    },
-  });
-
-  logger.info("Finished seeding product data.");
+  logger.info("🎉 Seeding complete.");
 }
