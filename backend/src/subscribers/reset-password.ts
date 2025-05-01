@@ -1,35 +1,35 @@
-import { type SubscriberConfig, type SubscriberArgs } from "@medusajs/medusa";
+import {
+  SubscriberArgs,
+  type SubscriberConfig,
+} from "@medusajs/medusa"
+import { Modules } from "@medusajs/framework/utils"
 
-export default async function handleAdminPasswordReset({
-  data,
-  eventName,
+export default async function resetPasswordTokenHandler({
+  event: { data: {
+    entity_id: email,
+    token,
+    actor_type,
+  } },
   container,
-  pluginOptions,
-}: SubscriberArgs<Record<string, string>>) {
-  const sendGridService = container.resolve("sendgridService");
+}: SubscriberArgs<{ entity_id: string, token: string, actor_type: string }>) {
+  const notificationModuleService = container.resolve(
+    Modules.NOTIFICATION
+  )
 
-  const resetPasswordLink =
-    process.env.RAILWAY_PUBLIC_DOMAIN + "/reset-password?token=" + data.token;
+  const urlPrefix = actor_type === "customer" ? 
+    "https://storefront.com" : 
+    "https://backend-production-a427.up.railway.app/dashboard"
 
-  const templateId = process.env.SENDGRID_RESET_ADMIN_PASSWORD_TEMPLATE_EN;
-
-  sendGridService
-    .sendEmail({
-      templateId: templateId,
-      from: process.env.SENDGRID_FROM,
-      to: data.email,
-      dynamic_template_data: {
-        reset_password_link: resetPasswordLink,
-      },
-    })
-    .catch((err) => {
-      // Handle SendGrid error (optional: add logging here)
-    });
+  await notificationModuleService.createNotifications({
+    to: email,
+    channel: "email",
+    template: "reset-password-template",
+    data: {
+      url: `${urlPrefix}/reset-password?token=${token}&email=${email}`,
+    },
+  })
 }
 
 export const config: SubscriberConfig = {
-  event: "user.password_reset",
-  context: {
-    subscriberId: "reset-admin-password-handler",
-  },
-};
+  event: "auth.password_reset",
+}
