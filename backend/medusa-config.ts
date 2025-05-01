@@ -27,7 +27,7 @@ module.exports = defineConfig({
     },
   },
   modules: {
-    notifications: {
+  [Modules.NOTIFICATION]: {
       resolve: "@medusajs/medusa/notification",
       options: {
         providers: [
