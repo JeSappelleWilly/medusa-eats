@@ -27,7 +27,7 @@ module.exports = defineConfig({
     },
   },
   modules: {
-   stripeService: {
+  [Modules.PAYMENT]: {
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
