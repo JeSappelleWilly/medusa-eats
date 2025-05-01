@@ -6,6 +6,13 @@ const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379"
 module.exports = defineConfig({
   admin: {
     backendUrl: "https://backend-production-a427.up.railway.app",
+    vite: () => {
+      return {
+        server: {
+          allowedHosts: [".up.railway.app"],
+        },
+      };
+    },
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
