@@ -18,6 +18,7 @@ import {
   ModuleRegistrationName,
   Modules,
   ProductStatus,
+  RuleOperatorType,
 } from "@medusajs/utils";
 import dotenv from "dotenv";
 import medusaEatsSeedData from "../../data/medusa-eats-seed-data.json";
@@ -62,7 +63,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   logger.info("🌱 Starting seeding demo data...");
 
   // --- Sales Channel & Store Setup ---
-  let [store] = await storeService.listStores();
+  const [store] = await storeService.listStores();
   let channels = await salesChannelService.listSalesChannels({ name: "Default Sales Channel" });
   if (!channels.length) {
     const { result } = await createSalesChannelsWorkflow(container).run({
@@ -91,10 +92,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   // --- Region & Tax Setup ---
   logger.info("🗺️ Creating regions...");
-  const { result: regions } = await createRegionsWorkflow(container).run({
+  const { result: createdRegions } = await createRegionsWorkflow(container).run({
     input: { regions: REGIONS },
   });
-  logger.info(`✅ Created ${regions.length} regions`);
+  logger.info(`✅ Created ${createdRegions.length} regions`);
 
   // Create tax regions for every country across all regions
   const allCountries = REGIONS.flatMap(r => r.countries);
@@ -103,38 +104,37 @@ export default async function seedDemoData({ container }: ExecArgs) {
   });
   logger.info("✅ Created tax regions for all countries");
 
-  // --- Shipping Profile ---
+  // --- Shipping Profile & Provider ---
   const { result: shippingProfiles } = await createShippingProfilesWorkflow(container).run({
     input: { data: [{ name: "Default", type: "default" }] },
   });
   const shippingProfile = shippingProfiles[0];
-
-  // Get default fulfillment provider
   const provider = (await fulfillmentService.listFulfillmentProviders({}, { take: 1 }))[0];
 
-  // --- Fulfillment & Stock Location per Region ---
-  for (const reg of regions) {
-    logger.info(`🚚 Seeding fulfillment & stock location for ${reg.name}...`);
+  // --- Fulfillment & Stock Location per Defined Region ---
+  for (const regionDef of REGIONS) {
+    logger.info(`🚚 Seeding fulfillment & stock location for ${regionDef.name}...`);
 
-    // 1. Fulfillment Set
+    // Match the created region to get its service_zone IDs if needed later
+    const region = createdRegions.find(r => r.name === regionDef.name)!;
+
+    // 1. Fulfillment Set (expects array)
     const serviceZone = {
-      name: `${reg.name} Zone`,
-      geo_zones: reg.countries.map(cc => ({ country_code: cc, type: "country" })),
+      name: `${regionDef.name} Zone`,
+      geo_zones: regionDef.countries.map(code => ({ country_code: code, type: "country" })),
     };
-    const fulfillmentSet = await fulfillmentService.createFulfillmentSets({
-      name: `${reg.name} Warehouse Delivery`,
-      type: "shipping",
-      service_zones: [serviceZone],
-    });
+    const [fulfillmentSet] = await fulfillmentService.createFulfillmentSets([
+      { name: `${regionDef.name} Warehouse Delivery`, type: "shipping", service_zones: [serviceZone] },
+    ]);
 
     // 2. Stock Location
     const { result: stockLocations } = await createStockLocationsWorkflow(container).run({
       input: {
         locations: [{
-          name: `${reg.name} Warehouse`,
+          name: `${regionDef.name} Warehouse`,
           address: {
-            city: `${reg.name} HQ`, 
-            country_code: reg.countries[0].toUpperCase(),
+            city: `${regionDef.name} HQ`, 
+            country_code: regionDef.countries[0].toUpperCase(),
             address_1: "",
           },
         }],
@@ -152,7 +152,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     // 4. Shipping Options
     const regionShippingOptions = [
       {
-        name: `${reg.name} Standard Shipping`,
+        name: `${regionDef.name} Standard Shipping`,
         price_type: "flat",
         provider_id: provider.id,
         service_zone_id: fulfillmentSet.service_zones[0].id,
@@ -160,12 +160,12 @@ export default async function seedDemoData({ container }: ExecArgs) {
         type: { label: "Standard", description: "Ship in 2-3 days.", code: "standard" },
         prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 10 })),
         rules: [
-          { attribute: "enabled_in_store", operator: "eq", value: '"true"' },
-          { attribute: "is_return", operator: "eq", value: "false" },
+          { attribute: "enabled_in_store", operator: RuleOperatorType.EQ, value: '"true"' },
+          { attribute: "is_return", operator: RuleOperatorType.EQ, value: "false" },
         ],
       },
       {
-        name: `${reg.name} Express Shipping`,
+        name: `${regionDef.name} Express Shipping`,
         price_type: "flat",
         provider_id: provider.id,
         service_zone_id: fulfillmentSet.service_zones[0].id,
@@ -173,13 +173,13 @@ export default async function seedDemoData({ container }: ExecArgs) {
         type: { label: "Express", description: "Ship in 24 hours.", code: "express" },
         prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 20 })),
         rules: [
-          { attribute: "enabled_in_store", operator: "eq", value: '"true"' },
-          { attribute: "is_return", operator: "eq", value: "false" },
+          { attribute: "enabled_in_store", operator: RuleOperatorType.EQ, value: '"true"' },
+          { attribute: "is_return", operator: RuleOperatorType.EQ, value: "false" },
         ],
       },
     ];
     await createShippingOptionsWorkflow(container).run({ input: regionShippingOptions });
-    logger.info(`✅ Seeded shipping for ${reg.name}`);
+    logger.info(`✅ Seeded shipping for ${regionDef.name}`);
   }
 
   // --- API Keys & Channel Linking ---
@@ -195,7 +195,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   logger.info("🍽️ Seeding restaurant & product data...");
   const { restaurant } = medusaEatsSeedData;
   restaurant.image_url = FRONTEND_URL + restaurant.image_url;
-  const { result: [createdRestaurant] } = await createRestaurantWorkflow(container).run({ input: { restaurant } });
+  const { result: createdRestaurant } = await createRestaurantWorkflow(container).run({ input: { restaurant } });
 
   const { result: categories } = await createProductCategoriesWorkflow(container).run({
     input: { product_categories: medusaEatsSeedData.categories },
