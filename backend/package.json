@@ -16,7 +16,7 @@
   "scripts": {
     "build": "medusa build",
     "seed": "medusa exec ./src/scripts/seed.ts",
-    "postinstall": "node postinstall.js",
+    "create-admin": "npx medusa user -e willytheigeek@gmail.com -p supersecret",
     "start": "medusa start",
     "dev": "medusa develop",
     "setup-db": "npx medusa build && npx medusa db:migrate && npx medusa db:sync-links && medusa exec ./src/scripts/seed.ts && npx medusa user -e admin@email.com -p supersecret",
