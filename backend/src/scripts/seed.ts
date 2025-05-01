@@ -18,7 +18,7 @@ import {
   ModuleRegistrationName,
   Modules,
   ProductStatus,
-  RuleOperatorType,
+  RuleOperator,
 } from "@medusajs/utils";
 import dotenv from "dotenv";
 import medusaEatsSeedData from "../../data/medusa-eats-seed-data.json";
@@ -115,17 +115,16 @@ export default async function seedDemoData({ container }: ExecArgs) {
   for (const regionDef of REGIONS) {
     logger.info(`🚚 Seeding fulfillment & stock location for ${regionDef.name}...`);
 
-    // Match the created region to get its service_zone IDs if needed later
-    const region = createdRegions.find(r => r.name === regionDef.name)!;
-
-    // 1. Fulfillment Set (expects array)
+    // 1. Fulfillment Set
     const serviceZone = {
       name: `${regionDef.name} Zone`,
       geo_zones: regionDef.countries.map(code => ({ country_code: code, type: "country" })),
     };
-    const [fulfillmentSet] = await fulfillmentService.createFulfillmentSets([
-      { name: `${regionDef.name} Warehouse Delivery`, type: "shipping", service_zones: [serviceZone] },
-    ]);
+    const fulfillmentSet = await fulfillmentService.createFulfillmentSets({
+      name: `${regionDef.name} Warehouse Delivery`,
+      type: "shipping",
+      service_zones: [serviceZone],
+    });
 
     // 2. Stock Location
     const { result: stockLocations } = await createStockLocationsWorkflow(container).run({
@@ -134,7 +133,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
           name: `${regionDef.name} Warehouse`,
           address: {
             city: `${regionDef.name} HQ`, 
-            country_code: regionDef.countries[0].toUpperCase(),
+            country_code: regionDef.countries[0],
             address_1: "",
           },
         }],
@@ -160,8 +159,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         type: { label: "Standard", description: "Ship in 2-3 days.", code: "standard" },
         prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 10 })),
         rules: [
-          { attribute: "enabled_in_store", operator: RuleOperatorType.EQ, value: '"true"' },
-          { attribute: "is_return", operator: RuleOperatorType.EQ, value: "false" },
+          { attribute: "enabled_in_store", operator: RuleOperator.EQ, value: '"true"' },
+          { attribute: "is_return", operator: RuleOperator.EQ, value: "false" },
         ],
       },
       {
@@ -173,8 +172,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         type: { label: "Express", description: "Ship in 24 hours.", code: "express" },
         prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 20 })),
         rules: [
-          { attribute: "enabled_in_store", operator: RuleOperatorType.EQ, value: '"true"' },
-          { attribute: "is_return", operator: RuleOperatorType.EQ, value: "false" },
+          { attribute: "enabled_in_store", operator: RuleOperator.EQ, value: '"true"' },
+          { attribute: "is_return", operator: RuleOperator.EQ, value: "false" },
         ],
       },
     ];
