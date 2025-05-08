@@ -12,6 +12,7 @@ import { BikeIcon } from "../../components/icons";
 import { useDeliveries, useDrivers } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import { Plus, StackPerspective } from "@medusajs/icons"
+import { CreateDriverForm } from "../../components/forms/drivers/create-drivers-form";
 
 const Drivers = () => {
   const { data, loading } = useDrivers();
@@ -31,10 +32,7 @@ const Drivers = () => {
       <div className="p-6 flex items-center justify-between">
         <Heading className="txt-large-plus">Drivers</Heading>
         <div className="flex gap-x-2">
-          <Button variant="primary" onClick={handleCreate}>
-            <Plus className="mr-2" />
-            Create
-          </Button>
+          <CreateDriverForm />
           <Button variant="secondary" onClick={handleExport}>
             <StackPerspective className="mr-2" />
             Export
