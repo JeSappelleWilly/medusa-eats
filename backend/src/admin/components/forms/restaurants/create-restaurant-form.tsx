@@ -1,3 +1,4 @@
+import React from "react"
 import { useForm, FormProvider, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as zod from "zod"
@@ -69,112 +70,76 @@ export const CreateRestaurantForm = () => {
               </div>
             </FocusModal.Header>
             <FocusModal.Body>
-              <div className="flex flex-1 flex-col items-center overflow-y-auto">
-                <div className="mx-auto flex w-full max-w-[720px] flex-col gap-y-8 px-2 py-16">
+              <div className="flex flex-1 flex-col items-center overflow-y-auto p-6"> {/* Added p-6 for padding */}
+                <div className="mx-auto flex w-full max-w-[720px] flex-col gap-y-8"> {/* Increased gap-y */}
                   <div>
                     <Heading className="capitalize">Create Restaurant</Heading>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Controller
-                      name="handle"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex flex-col space-y-2">
-                          <Label size="small" weight="plus">
-                            Handle
-                          </Label>
-                          <Input {...field} />
-                        </div>
-                      )}
-                    />
-                    <Controller
-                      name="name"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex flex-col space-y-2">
-                          <Label size="small" weight="plus">
-                            Name
-                          </Label>
-                          <Input {...field} />
-                        </div>
-                      )}
-                    />
-                    <Controller
-                      name="is_open"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex items-center space-x-2">
-                        <Checkbox checked={field.value} onChange={field.onChange} />
-                        <Label size="small" weight="plus">
-                            Is Open
-                          </Label>
-                        </div>
-                      )}
-                    />
-                    <Controller
-                      name="address"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex flex-col space-y-2">
-                          <Label size="small" weight="plus">
-                            Address
-                          </Label>
-                          <Input {...field} />
-                        </div>
-                      )}
-                    />
-                    <Controller
-                      name="phone"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex flex-col space-y-2">
-                          <Label size="small" weight="plus">
-                            Phone
-                          </Label>
-                          <Input {...field} />
-                        </div>
-                      )}
-                    />
-                    <Controller
-                      name="email"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex flex-col space-y-2">
-                          <Label size="small" weight="plus">
-                            Email
-                          </Label>
-                          <Input {...field} />
-                        </div>
-                      )}
-                    />
-                    <Controller
-                      name="description"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex flex-col space-y-2">
-                          <Label size="small" weight="plus">
-                            Description
-                          </Label>
-                          <Input {...field} />
-                        </div>
-                      )}
-                    />
-                    <Controller
-                      name="image_url"
-                      control={form.control}
-                      render={({ field }) => (
-                        <div className="flex flex-col space-y-2">
-                          <Label size="small" weight="plus">
-                            Image URL
-                          </Label>
-                          <Input {...field} />
-                        </div>
-                      )}
-                    />
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-6"> {/* Added gap-y */}
+                    <div className="flex flex-col space-y-2">
+                      <Label size="small" weight="plus">
+                        Handle
+                      </Label>
+                      <Input {...form.register("handle")} /> {/* Using register for simplicity */}
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label size="small" weight="plus">
+                        Name
+                      </Label>
+                      <Input {...form.register("name")} />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox {...form.register("is_open")} />
+                      <Label size="small" weight="plus">
+                        Is Open
+                      </Label>
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label size="small" weight="plus">
+                        Address
+                      </Label>
+                      <Input {...form.register("address")} />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label size="small" weight="plus">
+                        Phone
+                      </Label>
+                      <Input {...form.register("phone")} />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label size="small" weight="plus">
+                        Email
+                      </Label>
+                      <Input {...form.register("email")} />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label size="small" weight="plus">
+                        Description
+                      </Label>
+                      <Input {...form.register("description")} />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label size="small" weight="plus">
+                        Image URL
+                      </Label>
+                      <Input {...form.register("image_url")} />
+                    </div>
                   </div>
                 </div>
               </div>
             </FocusModal.Body>
+            <FocusModal.Footer> {/* Added FocusModal.Footer */}
+              <div className="flex justify-end gap-x-2">
+                <FocusModal.Close asChild>
+                  <Button size="small" variant="secondary">
+                    Cancel
+                  </Button>
+                </FocusModal.Close>
+                <Button type="submit" size="small">
+                  Save
+                </Button>
+              </div>
+            </FocusModal.Footer>
           </form>
         </FormProvider>
       </FocusModal.Content>
