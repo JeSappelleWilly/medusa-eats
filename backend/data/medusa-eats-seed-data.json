@@ -39,8 +39,8 @@
       "discountable": true,
       "category": "pizzas",
       "options": [
-        { "title": "Size" },
-        { "title": "Crust" }
+        { "title": "Size", "values": ["Small", "Medium", "Large"] },
+        { "title": "Crust", "values": ["Thin", "Regular"] }
       ],
       "variants": [
         {
@@ -150,9 +150,9 @@
       "discountable": true,
       "category": "pizzas",
       "options": [
-        { "title": "Size" },
-        { "title": "Crust" },
-        { "title": "Spice Level" }
+        { "title": "Size", "values": ["Medium", "Large"] },
+        { "title": "Crust", "values": ["Regular"] },
+        { "title": "Spice Level", "values": ["Medium Spicy", "Extra Spicy"] }
       ],
       "variants": [
         {
@@ -227,8 +227,8 @@
       "discountable": true,
       "category": "falafel",
       "options": [
-        { "title": "Size" },
-        { "title": "Sauce" }
+        { "title": "Size", "values": ["Regular", "Large"] },
+        { "title": "Sauce", "values": ["Tahini", "Garlic"] }
       ],
       "variants": [
         {
@@ -300,8 +300,8 @@
       "discountable": true,
       "category": "falafel",
       "options": [
-        { "title": "Size" },
-        { "title": "Dressing" }
+        { "title": "Size", "values": ["Regular", "Large"] },
+        { "title": "Dressing", "values": ["Olive Oil", "Lemon Tahini"] }
       ],
       "variants": [
         {
@@ -373,7 +373,7 @@
       "discountable": true,
       "category": "drinks",
       "options": [
-        { "title": "Size" }
+        { "title": "Size", "values": ["Small (330ml)", "Large (500ml)"] }
       ],
       "variants": [
         {
@@ -424,8 +424,8 @@
       "discountable": true,
       "category": "drinks",
       "options": [
-        { "title": "Size" },
-        { "title": "Ice" }
+        { "title": "Size", "values": ["Regular (330ml)", "Large (500ml)"] },
+        { "title": "Ice", "values": ["With Ice", "No Ice"] }
       ],
       "variants": [
         {
