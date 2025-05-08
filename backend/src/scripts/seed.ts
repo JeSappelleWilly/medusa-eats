@@ -154,32 +154,32 @@ export default async function seedDemoData({ container }: ExecArgs) {
     const regionShippingOptions = [
       {
         name: `${regionDef.name} Standard Shipping`,
-        price_type: "flat",
+        price_type: "flat" as const,
         provider_id: provider.id,
         service_zone_id: fulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
         type: { label: "Standard", description: "Ship in 2-3 days.", code: "standard" },
         prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 10 })),
         rules: [
-          { attribute: "enabled_in_store", operator: RuleOperator.EQ, value: '"true"' },
+          { attribute: "enabled_in_store", operator: RuleOperator.EQ, value: "true" },
           { attribute: "is_return", operator: RuleOperator.EQ, value: "false" },
         ],
       },
       {
         name: `${regionDef.name} Express Shipping`,
-        price_type: "flat",
+        price_type: "flat" as const,
         provider_id: provider.id,
         service_zone_id: fulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
         type: { label: "Express", description: "Ship in 24 hours.", code: "express" },
         prices: supportedCurrencies.map(cur => ({ currency_code: cur.currency_code, amount: 20 })),
         rules: [
-          { attribute: "enabled_in_store", operator: RuleOperator.EQ, value: '"true"' },
+          { attribute: "enabled_in_store", operator: RuleOperator.EQ, value: "true" },
           { attribute: "is_return", operator: RuleOperator.EQ, value: "false" },
         ],
       },
     ];
-    await createShippingOptionsWorkflow(container).run({ input: { shipping_options: regionShippingOptions } });
+    await createShippingOptionsWorkflow(container).run({ input: regionShippingOptions });   
     logger.info(`✅ Seeded shipping for ${regionDef.name}`);
   }
 
