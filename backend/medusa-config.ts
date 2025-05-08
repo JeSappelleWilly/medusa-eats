@@ -65,7 +65,6 @@ module.exports = defineConfig({
         redisUrl: REDIS_URL
       }
     },
-
     [Modules.WORKFLOW_ENGINE]: {
       resolve: "@medusajs/medusa/workflow-engine-inmemory",
     },
