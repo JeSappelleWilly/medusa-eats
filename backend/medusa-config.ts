@@ -65,6 +65,7 @@ module.exports = defineConfig({
         redisUrl: REDIS_URL
       }
     },
+
     [Modules.WORKFLOW_ENGINE]: {
       resolve: "@medusajs/medusa/workflow-engine-inmemory",
     },
@@ -73,6 +74,14 @@ module.exports = defineConfig({
       options: {
         redisUrl: REDIS_URL
       }
+    },
+    bot: {
+      resolve:"medusa-plugin-whatsapp",
+      options: {
+          account_sid: process.env.TWILIO_AUTH_SID,
+          auth_token: process.env.TWILIO_AUTH_TOKEN,
+          whatsappHandlerInterface:"whatsAppService"
+      }      
     },
     restaurantModuleService: {
       resolve: "./modules/restaurant",
