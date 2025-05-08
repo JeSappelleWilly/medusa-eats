@@ -27,6 +27,16 @@ module.exports = defineConfig({
     },
   },
   modules: {
+  "whatsapp": {
+     resolve:"medusa-plugin-whatsapp":
+    {
+      options:{
+      account_sid: process.env.TWILIO_AUTH_SID,
+      auth_token: process.env.TWILIO_AUTH_TOKEN,
+      whatsappHandlerInterface:"chatbotService"
+      }
+    },
+  },
   [Modules.PAYMENT]: {
       resolve: "@medusajs/medusa/payment",
       options: {
