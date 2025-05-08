@@ -1,17 +1,45 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
-import { Container, Heading, Table, Text } from "@medusajs/ui";
+import {
+  Container,
+  Heading,
+  Table,
+  Text,
+  Button,
+} from "@medusajs/ui";
 import { DriverDTO } from "../../../modules/delivery/types/common";
 import DriverActionsMenu from "../../components/driver-actions-menu";
 import { BikeIcon } from "../../components/icons";
 import { useDeliveries, useDrivers } from "../../hooks";
+import { useNavigate } from "react-router-dom";
+import { Plus, StackPerspective } from "@medusajs/icons"
 
 const Drivers = () => {
   const { data, loading } = useDrivers();
 
+  const handleCreate = () => {
+    // Implement your create logic here or navigate to a create page
+    console.log("Create button clicked");
+  };
+
+  const handleExport = () => {
+    // Implement your export logic here
+    console.log("Export button clicked");
+  };
+
   return (
     <Container className="flex flex-col p-0 overflow-hidden">
-      <div className="p-6">
+      <div className="p-6 flex items-center justify-between">
         <Heading className="txt-large-plus">Drivers</Heading>
+        <div className="flex gap-x-2">
+          <Button variant="primary" onClick={handleCreate}>
+            <Plus className="mr-2" />
+            Create
+          </Button>
+          <Button variant="secondary" onClick={handleExport}>
+            <StackPerspective className="mr-2" />
+            Export
+          </Button>
+        </div>
       </div>
       <Table>
         <Table.Header>
