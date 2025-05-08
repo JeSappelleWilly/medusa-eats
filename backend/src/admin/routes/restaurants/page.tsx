@@ -3,15 +3,12 @@ import { Button, Container, Heading, StatusBadge, Table, Text } from "@medusajs/
 import ActionsMenu from "../../components/actions-menu";
 import { StoreIcon } from "../../components/icons";
 import { useRestaurants } from "../../hooks";
-import { Plus, StackPerspective } from "@medusajs/icons"
+import { StackPerspective } from "@medusajs/icons"
+import { CreateRestaurantForm } from "src/admin/components/forms/restaurants/create-restaurant-form";
 
 const Restaurants = () => {
   const { data, loading } = useRestaurants();
 
-  const handleCreate = () => {
-    // Implement your create logic here or navigate to a create page
-    console.log("Create button clicked");
-  };
 
   const handleExport = () => {
     // Implement your export logic here
@@ -22,10 +19,7 @@ const Restaurants = () => {
       <div className="p-6 flex items-center justify-between">
         <Heading className="txt-large-plus">Restaurants</Heading>
         <div className="flex gap-x-2">
-          <Button variant="primary" onClick={handleCreate}>
-            <Plus className="mr-2" />
-            Create
-          </Button>
+          <CreateRestaurantForm />
           <Button variant="secondary" onClick={handleExport}>
             <StackPerspective className="mr-2" />
             Export
