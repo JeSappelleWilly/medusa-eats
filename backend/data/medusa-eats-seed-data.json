@@ -38,11 +38,19 @@
       "thumbnail": "/_1ed747de-53f1-4915-aaba-92c046039beb.jpeg",
       "discountable": true,
       "category": "pizzas",
+      "options": [
+        { "title": "Size" },
+        { "title": "Crust" }
+      ],
       "variants": [
         {
-          "title": "Margherita Delight",
+          "title": "Small Thin Crust Margherita",
           "manage_inventory": false,
-          "sku": "MARGHERITA-DELIGHT",
+          "sku": "MARGHERITA-SMALL-THIN",
+          "options": [
+            { "value": "Small" },
+            { "value": "Thin" }
+          ],
           "prices": [
             {
               "amount": 12.99,
@@ -50,6 +58,82 @@
             },
             {
               "amount": 9.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Medium Thin Crust Margherita",
+          "manage_inventory": false,
+          "sku": "MARGHERITA-MEDIUM-THIN",
+          "options": [
+            { "value": "Medium" },
+            { "value": "Thin" }
+          ],
+          "prices": [
+            {
+              "amount": 15.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 12.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Large Thin Crust Margherita",
+          "manage_inventory": false,
+          "sku": "MARGHERITA-LARGE-THIN",
+          "options": [
+            { "value": "Large" },
+            { "value": "Thin" }
+          ],
+          "prices": [
+            {
+              "amount": 18.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 15.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Small Regular Crust Margherita",
+          "manage_inventory": false,
+          "sku": "MARGHERITA-SMALL-REGULAR",
+          "options": [
+            { "value": "Small" },
+            { "value": "Regular" }
+          ],
+          "prices": [
+            {
+              "amount": 12.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 9.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Medium Regular Crust Margherita",
+          "manage_inventory": false,
+          "sku": "MARGHERITA-MEDIUM-REGULAR",
+          "options": [
+            { "value": "Medium" },
+            { "value": "Regular" }
+          ],
+          "prices": [
+            {
+              "amount": 15.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 12.99,
               "currency_code": "eur"
             }
           ]
@@ -65,11 +149,61 @@
       "thumbnail": "/_35841975-1e89-4c07-adb8-208cc8c59e17.jpeg",
       "discountable": true,
       "category": "pizzas",
+      "options": [
+        { "title": "Size" },
+        { "title": "Crust" },
+        { "title": "Spice Level" }
+      ],
       "variants": [
         {
-          "title": "Spicy Pepperoni Extravaganza",
+          "title": "Medium Regular Crust Medium Spicy",
           "manage_inventory": false,
-          "sku": "SPICY-PEPPERONI-EXTRAVAGANZA",
+          "sku": "PEPPERONI-MEDIUM-REGULAR-MEDIUM",
+          "options": [
+            { "value": "Medium" },
+            { "value": "Regular" },
+            { "value": "Medium Spicy" }
+          ],
+          "prices": [
+            {
+              "amount": 14.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 11.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Large Regular Crust Medium Spicy",
+          "manage_inventory": false,
+          "sku": "PEPPERONI-LARGE-REGULAR-MEDIUM",
+          "options": [
+            { "value": "Large" },
+            { "value": "Regular" },
+            { "value": "Medium Spicy" }
+          ],
+          "prices": [
+            {
+              "amount": 17.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 14.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Medium Regular Crust Extra Spicy",
+          "manage_inventory": false,
+          "sku": "PEPPERONI-MEDIUM-REGULAR-EXTRA",
+          "options": [
+            { "value": "Medium" },
+            { "value": "Regular" },
+            { "value": "Extra Spicy" }
+          ],
           "prices": [
             {
               "amount": 14.99,
@@ -92,11 +226,57 @@
       "thumbnail": "/_de4759b3-096f-47f6-936a-ea291df53f9f.jpeg",
       "discountable": true,
       "category": "falafel",
+      "options": [
+        { "title": "Size" },
+        { "title": "Sauce" }
+      ],
       "variants": [
         {
-          "title": "Falafel Wrap Supreme",
+          "title": "Regular Tahini Sauce",
           "manage_inventory": false,
-          "sku": "FALAFEL-WRAP-SUPREME",
+          "sku": "FALAFEL-WRAP-REGULAR-TAHINI",
+          "options": [
+            { "value": "Regular" },
+            { "value": "Tahini" }
+          ],
+          "prices": [
+            {
+              "amount": 9.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 7.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Large Tahini Sauce",
+          "manage_inventory": false,
+          "sku": "FALAFEL-WRAP-LARGE-TAHINI",
+          "options": [
+            { "value": "Large" },
+            { "value": "Tahini" }
+          ],
+          "prices": [
+            {
+              "amount": 12.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 10.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Regular Garlic Sauce",
+          "manage_inventory": false,
+          "sku": "FALAFEL-WRAP-REGULAR-GARLIC",
+          "options": [
+            { "value": "Regular" },
+            { "value": "Garlic" }
+          ],
           "prices": [
             {
               "amount": 9.99,
@@ -119,11 +299,57 @@
       "thumbnail": "/_411c260a-d6e5-4989-9a00-1cd8b80265fb.jpeg",
       "discountable": true,
       "category": "falafel",
+      "options": [
+        { "title": "Size" },
+        { "title": "Dressing" }
+      ],
       "variants": [
         {
-          "title": "Mediterranean Falafel Salad",
+          "title": "Regular Olive Oil Dressing",
           "manage_inventory": false,
-          "sku": "MEDITERRANEAN-FALAFEL-SALAD",
+          "sku": "FALAFEL-SALAD-REGULAR-OLIVE",
+          "options": [
+            { "value": "Regular" },
+            { "value": "Olive Oil" }
+          ],
+          "prices": [
+            {
+              "amount": 11.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 8.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Large Olive Oil Dressing",
+          "manage_inventory": false,
+          "sku": "FALAFEL-SALAD-LARGE-OLIVE",
+          "options": [
+            { "value": "Large" },
+            { "value": "Olive Oil" }
+          ],
+          "prices": [
+            {
+              "amount": 14.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 11.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Regular Lemon Tahini Dressing",
+          "manage_inventory": false,
+          "sku": "FALAFEL-SALAD-REGULAR-LEMON",
+          "options": [
+            { "value": "Regular" },
+            { "value": "Lemon Tahini" }
+          ],
           "prices": [
             {
               "amount": 11.99,
@@ -146,11 +372,17 @@
       "thumbnail": "/_ca16b6a2-9c4c-4a6a-98fa-620f12f6123f.jpeg",
       "discountable": true,
       "category": "drinks",
+      "options": [
+        { "title": "Size" }
+      ],
       "variants": [
         {
-          "title": "Craft Lager Beer",
+          "title": "Small Craft Lager Beer",
           "manage_inventory": false,
-          "sku": "CRAFT-LAGER-BEER",
+          "sku": "CRAFT-LAGER-SMALL",
+          "options": [
+            { "value": "Small (330ml)" }
+          ],
           "prices": [
             {
               "amount": 5.99,
@@ -158,6 +390,24 @@
             },
             {
               "amount": 4.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Large Craft Lager Beer",
+          "manage_inventory": false,
+          "sku": "CRAFT-LAGER-LARGE",
+          "options": [
+            { "value": "Large (500ml)" }
+          ],
+          "prices": [
+            {
+              "amount": 7.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 6.99,
               "currency_code": "eur"
             }
           ]
@@ -173,11 +423,19 @@
       "thumbnail": "/_4476ce30-b852-402d-b65f-e3db54165e4c.jpeg",
       "discountable": true,
       "category": "drinks",
+      "options": [
+        { "title": "Size" },
+        { "title": "Ice" }
+      ],
       "variants": [
         {
-          "title": "Chilled Coke Zero",
+          "title": "Regular Coke Zero with Ice",
           "manage_inventory": false,
-          "sku": "CHILLED-COKE-ZERO",
+          "sku": "COKE-ZERO-REGULAR-ICE",
+          "options": [
+            { "value": "Regular (330ml)" },
+            { "value": "With Ice" }
+          ],
           "prices": [
             {
               "amount": 2.99,
@@ -185,6 +443,44 @@
             },
             {
               "amount": 1.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Regular Coke Zero No Ice",
+          "manage_inventory": false,
+          "sku": "COKE-ZERO-REGULAR-NO-ICE",
+          "options": [
+            { "value": "Regular (330ml)" },
+            { "value": "No Ice" }
+          ],
+          "prices": [
+            {
+              "amount": 2.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 1.99,
+              "currency_code": "eur"
+            }
+          ]
+        },
+        {
+          "title": "Large Coke Zero with Ice",
+          "manage_inventory": false,
+          "sku": "COKE-ZERO-LARGE-ICE",
+          "options": [
+            { "value": "Large (500ml)" },
+            { "value": "With Ice" }
+          ],
+          "prices": [
+            {
+              "amount": 3.99,
+              "currency_code": "usd"
+            },
+            {
+              "amount": 2.99,
               "currency_code": "eur"
             }
           ]
