@@ -4,7 +4,7 @@ import ActionsMenu from "../../components/actions-menu";
 import { StoreIcon } from "../../components/icons";
 import { useRestaurants } from "../../hooks";
 import { StackPerspective } from "@medusajs/icons"
-import { CreateRestaurantForm } from "src/admin/components/forms/restaurants/create-restaurant-form";
+import { CreateRestaurantForm } from "../../components/forms/restaurants/create-restaurant-form";
 
 const Restaurants = () => {
   const { data, loading } = useRestaurants();
