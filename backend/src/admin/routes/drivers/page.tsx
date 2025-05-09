@@ -12,7 +12,7 @@ import { BikeIcon } from "../../components/icons";
 import { useDeliveries, useDrivers } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import { Plus, StackPerspective } from "@medusajs/icons"
-import { CreateDriverForm } from "../../components/forms/drivers/create-drivers-form";
+import { CreateDriverForm } from "../../components/forms/drivers/create-driver-form";
 
 const Drivers = () => {
   const { data, loading } = useDrivers();
