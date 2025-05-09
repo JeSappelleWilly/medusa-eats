@@ -96,4 +96,26 @@ export const CreateDriverForm = () => {
                     <Label size="small" weight="plus">
                       Avatar URL (Optional)
                     </Label>
-                    <Input {...form.register("
+                    <Input {...form.register("avatar_url")} />
+                  </div>
+                </div>
+              </div>
+            </FocusModal.Body>
+            <FocusModal.Footer>
+              <div className="flex justify-end gap-x-2">
+                <FocusModal.Close asChild>
+                  <Button size="small" variant="secondary">
+                    Cancel
+                  </Button>
+                </FocusModal.Close>
+                <Button type="submit" size="small">
+                  Save
+                </Button>
+              </div>
+            </FocusModal.Footer>
+          </form>
+        </FormProvider>
+      </FocusModal.Content>
+    </FocusModal>
+  );
+};
